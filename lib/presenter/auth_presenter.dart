@@ -1,6 +1,7 @@
 import 'package:asisten_buku_kebun/data/model/user_model.dart';
 import 'package:asisten_buku_kebun/data/preferences/app_shared_preferences.dart';
 import 'package:asisten_buku_kebun/data/request_state.dart';
+import 'package:flutter_bcrypt/flutter_bcrypt.dart';
 
 class AuthPresenter{
 
@@ -9,15 +10,15 @@ class AuthPresenter{
   UserModel? registerResult;
 
   Future<bool> register({
-    required String username,
     required String name,
     required String email,
-    required String phone,
     required String password,
   }) async {
     // set registerResult
     registerResult = null;
     requestState = RequestState.loading;
+    var salt = await FlutterBcrypt.salt();
+    String hashedPassword = await FlutterBcrypt.hashPw(password: password, salt: salt);
     // TODO SEND REQUEST HERE
     // registerResult = await dataSource.signUp(
     //   username: username,
@@ -47,8 +48,13 @@ class AuthPresenter{
   Future<bool> login(String email, String password) async {
     // set loggedInUser
     loggedInUser = null;
+
     requestState = RequestState.loading;
+    var salt = await FlutterBcrypt.salt();
+    String hashedPassword = await FlutterBcrypt.hashPw(password: password, salt: salt);
+
     // loggedInUser = // TODO MAKE REQUEST HERE TO SUPABASE
+
     requestState = RequestState.loaded;
     if (loggedInUser != null) {
       requestState = RequestState.success;
