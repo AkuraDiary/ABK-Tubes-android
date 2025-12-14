@@ -10,7 +10,7 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <application
-        android:label="asisten_buku_kebun"
+        android:label="ABK App"
         android:name="${applicationName}"
         android:icon="@drawable/abk">
         <activity

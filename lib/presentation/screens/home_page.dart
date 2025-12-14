@@ -2,6 +2,7 @@ import 'package:asisten_buku_kebun/data/preferences/app_shared_preferences.dart'
 import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routing.dart';
 import 'package:flutter/material.dart';
+import 'package:asisten_buku_kebun/DI.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,13 +15,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // final _future = AppSharedPreferences.containsKey(AppSharedPreferences.userModelKey);//Supabase.instance.client.from('users').select();
 
+  String name = "";
+
   Future<void> _checkLogin() async {
-    final hasToken = await AppSharedPreferences.containsKey(
+    final hasLoggedIn = await AppSharedPreferences.containsKey(
       AppSharedPreferences.userModelKey,
     );
     if (!mounted) return;
-    if (hasToken) {
-      AppRouting().pushReplacement(AppRoutes.home);
+    print("hasLoggedIn: $hasLoggedIn");
+    if (hasLoggedIn) {
+      setState(() {
+        name = DI.authPresenter.loggedInUser?.name ?? "";
+      });
+      // AppRouting().pushReplacement(AppRoutes.home);
     } else {
       AppRouting().pushReplacement(AppRoutes.login);
     }
@@ -34,6 +41,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text("Welcome to home")));
+    return Scaffold(body: Center(child: Text("Welcome to home page, $name")));
   }
 }

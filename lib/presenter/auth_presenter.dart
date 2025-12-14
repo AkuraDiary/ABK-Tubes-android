@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:asisten_buku_kebun/data/model/user_model.dart';
 import 'package:asisten_buku_kebun/data/preferences/app_shared_preferences.dart';
 import 'package:asisten_buku_kebun/data/request_state.dart';
-import 'package:flutter_bcrypt/flutter_bcrypt.dart';
+import 'package:crypto/crypto.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthPresenter{
 
@@ -17,21 +20,26 @@ class AuthPresenter{
     // set registerResult
     registerResult = null;
     requestState = RequestState.loading;
-    var salt = await FlutterBcrypt.salt();
-    String hashedPassword = await FlutterBcrypt.hashPw(password: password, salt: salt);
-    // TODO SEND REQUEST HERE
-    // registerResult = await dataSource.signUp(
-    //   username: username,
-    //   name: name,
-    //   email: email,
-    //   phone: phone,
-    //   password: password,
-    // );
+
+    var bytes = utf8.encode(password); // data being hashed
+    String hashedPassword  = sha1.convert(bytes).toString();
+    var result = Supabase.instance.client.from('users').insert(
+      {
+        'name': name,
+        'email': email,
+        'password': hashedPassword,
+      },
+    ).select().single();
+
+    registerResult = await result.then((value) {
+      return UserModel.fromJson(value);
+    });
 
     requestState = RequestState.loaded;
 
     if (registerResult != null) {
       requestState = RequestState.success;
+      loggedInUser = registerResult;
       // If the registration is successful, return true
       return true;
     } else {
@@ -50,8 +58,9 @@ class AuthPresenter{
     loggedInUser = null;
 
     requestState = RequestState.loading;
-    var salt = await FlutterBcrypt.salt();
-    String hashedPassword = await FlutterBcrypt.hashPw(password: password, salt: salt);
+    var bytes = utf8.encode(password); // data being hashed
+    String hashedPassword  = sha1.convert(bytes).toString();
+
 
     // loggedInUser = // TODO MAKE REQUEST HERE TO SUPABASE
 

@@ -4,10 +4,15 @@ import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
 import 'package:asisten_buku_kebun/presentation/resources/text_styles_resources.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routing.dart';
+import 'package:asisten_buku_kebun/presentation/common/util/app_toast.dart';
+import 'package:asisten_buku_kebun/DI.dart';
+import 'package:asisten_buku_kebun/presenter/auth_presenter.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  RegisterScreen({super.key});
+
+  final AuthPresenter authPresenter = DI.authPresenter;
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -23,7 +28,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  Future<void> _register() async {}
+  Future<void> _register() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    try {
+      var isSuccess = await widget.authPresenter.register(
+        name: _nameController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      if (isSuccess) {
+        await widget.authPresenter.authenticate();
+        if (!mounted) return;
+        if (await widget.authPresenter.checkLogin()) {
+          // Navigate to dashboard
+          AppRouting().pushReplacement(AppRoutes.home);
+        } else {
+          // Show error message
+          showAppToast(
+            context,
+            'Login gagal. Silakan coba lagi',
+            title: 'Login Gagal',
+          );
+        }
+      } else {
+        // Show error message
+        showAppToast(
+          context,
+          'Terjadi kesalahan Silakan coba lagi',
+          title: 'Username & Password Salah',
+        );
+      }
+    } catch (e) {
+      // Handle errors here
+      showAppToast(
+        context,
+        'Terjadi kesalahan: $e. Silakan coba lagi',
+        title: 'Error Tidak Terduga 😢',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +80,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Scroll jika keyboard naik
           child: Column(
             children: [
-              Text("Selamat Datang", style: semibold20),
+              const SizedBox(height: 24),
+              Text(
+                "Selamat Datang",
+                style: semibold20.copyWith(color: AppColors.primary900),
+              ),
               const SizedBox(height: 24),
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -134,16 +184,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                       AppButton(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              onPressed: _register,
-                              buttonText: 'Daftar',
-                              backgroundColor: AppColors.primary900,
-                              textStyle: semibold16.copyWith(
-                                color: AppColors.white,
-                              ),
-                              key: const Key('loginButton'),
-                            ),
+                      AppButton(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        onPressed: _register,
+                        buttonText: 'Daftar',
+                        backgroundColor: AppColors.primary900,
+                        textStyle: semibold16.copyWith(color: AppColors.white),
+                        key: const Key('loginButton'),
+                      ),
                       const SizedBox(height: 16),
                       Align(
                         alignment: Alignment.center,
@@ -153,9 +201,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             const Text("Sudah Punya Akun?"),
                             TextButton(
                               onPressed: () {
-                                AppRouting().navigateTo(AppRoutes.login);
+                                AppRouting().pushReplacement(AppRoutes.login);
                               },
-                              child: Text('Masuk Sekarang', style: semibold16),
+                              child: Text(
+                                'Masuk Sekarang',
+                                style: semibold16.copyWith(
+                                  color: AppColors.primary900,
+                                ),
+                              ),
                             ),
                           ],
                         ),
