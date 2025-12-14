@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'presentation/screens/home_page.dart';
 
 class App extends StatelessWidget {
-  static late List<CameraDescription> cameras;
+
   const App({super.key});
 
   @override

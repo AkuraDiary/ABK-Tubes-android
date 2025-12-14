@@ -1,3 +1,4 @@
+import 'package:asisten_buku_kebun/DI.dart';
 import 'package:asisten_buku_kebun/app.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ Future<void> main() async {
     url: 'https://lkifvalbauettmawyssq.supabase.co',
     anonKey: 'sb_publishable_cWek2qw_oKyGhBGzDXjBxw_Ovw8QVAo',
   );
-  App.cameras = await availableCameras();
+  DI.cameras = await availableCameras();
+  DI.init();
   runApp(App());
 }
