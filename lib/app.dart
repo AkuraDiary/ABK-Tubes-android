@@ -1,20 +1,39 @@
+import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
+import 'package:asisten_buku_kebun/presentation/routing/app_routing.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import 'presentation/screens/home_page.dart';
 
-class App extends StatefulWidget {
+class App extends StatelessWidget {
+  static late List<CameraDescription> cameras;
   const App({super.key});
 
   @override
-  State<App> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        title: 'Instruments',
-      home: HomePage(),
+    return MaterialApp(
+      title: 'Instruments',
+      debugShowCheckedModeBanner: false,
+      navigatorKey: AppRouting.navigatorKey,
+      initialRoute: AppRoutes.home,
+      routes: AppRoutes.routes,
+      onGenerateRoute: (RouteSettings settings) {
+        final builder = AppRoutes.routes[settings.name];
+        if (builder == null) {
+          throw Exception('Route ${settings.name} not found');
+        }
+        return PageRouteBuilder(
+          pageBuilder: (context, __, ___) => builder(context),
+          transitionDuration: const Duration(milliseconds: 1000),
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          settings: settings, // Pass along arguments if needed
+        );
+      },
     );
   }
 }

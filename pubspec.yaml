@@ -38,6 +38,8 @@ dependencies:
   supabase_flutter: ^2.12.0
   shared_preferences: ^2.5.4
   image_picker: ^1.2.1
+  camera: ^0.11.3
+  flutter_image_compress: ^2.4.0
 
 dev_dependencies:
   flutter_test:
