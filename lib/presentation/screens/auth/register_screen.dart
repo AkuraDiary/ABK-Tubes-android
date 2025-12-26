@@ -38,10 +38,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-
+      if (!mounted) return;
       if (isSuccess) {
         await widget.authPresenter.authenticate();
-        if (!mounted) return;
         if (await widget.authPresenter.checkLogin()) {
           // Navigate to dashboard
           AppRouting().pushReplacement(AppRoutes.home);

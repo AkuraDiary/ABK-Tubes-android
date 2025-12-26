@@ -29,13 +29,25 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     try {
-      // if () {
-      //
-      // } else {
-      //   // Show error message
-      //   showAppToast(context, 'Terjadi kesalahan Silakan coba lagi',
-      //       title: 'Username & Password Salah');
-      // }
+      bool success = await widget.authPresenter.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+      if (!mounted) return;
+      if (success) {
+        showAppToast(
+          context,
+          'Login berhasil! Selamat datang kembali.',
+          title: 'Sukses 🎉',
+        );
+        AppRouting().pushReplacement(AppRoutes.home);
+      } else {
+        showAppToast(
+          context,
+          'Login gagal! Periksa email dan password Anda.',
+          title: 'Gagal ❌',
+        );
+      }
     } catch (e) {
       showAppToast(
         context,
