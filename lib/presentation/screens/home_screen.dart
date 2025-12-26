@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:asisten_buku_kebun/DI.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeScreen> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomeScreen> {
   // final _future = AppSharedPreferences.containsKey(AppSharedPreferences.userModelKey);//Supabase.instance.client.from('users').select();
 
   String name = "";

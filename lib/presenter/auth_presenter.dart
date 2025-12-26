@@ -61,8 +61,12 @@ class AuthPresenter{
     var bytes = utf8.encode(password); // data being hashed
     String hashedPassword  = sha1.convert(bytes).toString();
 
+    var result = Supabase.instance.client.from('users').select().eq('email', email).eq('password', hashedPassword).single();
 
-    // loggedInUser = // TODO MAKE REQUEST HERE TO SUPABASE
+    loggedInUser= await result.then((value) {
+      return UserModel.fromJson(value);
+    });
+
 
     requestState = RequestState.loaded;
     if (loggedInUser != null) {
@@ -77,10 +81,10 @@ class AuthPresenter{
   }
 
   Future<void> logout() async {
-    // Simulate a network call or database query
-    // await Future.delayed(const Duration(seconds: 1));
-    // TODO MAKE REQUEST HERE TO SUPABASE TO LOGOUT USER
-    // TODO DEAUTHENTICATE USER LOCALLY
+    loggedInUser = null;
+    registerResult = null;
+    requestState = RequestState.initial;
+    deauthenticate();
     // For demonstration purposes, let's assume the logout is always successful
   }
 
@@ -101,6 +105,7 @@ class AuthPresenter{
     await AppSharedPreferences.clearPreferences();
     await AppSharedPreferences.removeKey(AppSharedPreferences.userModelKey);
   }
+
   Future<bool> checkLogin() async {
     final hasAccount = await AppSharedPreferences.containsKey(AppSharedPreferences.userModelKey);
     return hasAccount;

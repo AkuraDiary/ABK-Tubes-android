@@ -39,7 +39,9 @@ class CropPresenter {
     requestState = RequestState.initial;
     try {
       requestState = RequestState.loading;
-      await Supabase.instance.client.from('crops').insert(crop.toJson());
+      // var result =
+      await Supabase.instance.client.from('crops').insert(crop.toJson()).select().single();
+      // CropModel? resultData = CropModel.fromJson(result);
       requestState = RequestState.success;
     } catch (e) {
       requestState = RequestState.error;
@@ -54,7 +56,9 @@ class CropPresenter {
       await Supabase.instance.client
           .from('crops')
           .update(crop.toJson())
-          .eq('crop_id', crop.cropId!);
+          .eq('crop_id', crop.cropId!).select().single();
+
+
       requestState = RequestState.success;
     } catch (e) {
       requestState = RequestState.error;

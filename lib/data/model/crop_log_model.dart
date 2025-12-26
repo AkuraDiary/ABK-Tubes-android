@@ -1,6 +1,6 @@
 class CropLogModel {
   String? cropLogId;
-  String? createdAt;
+  String? createdAt;   // "2025-12-24T14:01:35.042432+00:00",
   String? cropId;
   String? notes;
   String? logTag;

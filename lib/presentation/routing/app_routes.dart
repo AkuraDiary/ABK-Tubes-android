@@ -1,6 +1,6 @@
 import 'package:asisten_buku_kebun/presentation/screens/auth/login_screen.dart';
 import 'package:asisten_buku_kebun/presentation/screens/auth/register_screen.dart';
-import 'package:asisten_buku_kebun/presentation/screens/home_page.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {
@@ -25,7 +25,7 @@ class AppRoutes {
   static Map<String, WidgetBuilder> get routes {
     return {
       // Replace with actual widget
-      AppRoutes.home: (context) =>  HomePage(),
+      AppRoutes.home: (context) =>  HomeScreen(),
       AppRoutes.login: (context) => LoginScreen(),
       AppRoutes.register: (context) =>  RegisterScreen(),
       //
