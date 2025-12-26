@@ -52,10 +52,22 @@ class CropLogPresenter {
           'file': bytes,
         },
       );
-      requestState = RequestState.success;
+
+      if (response.status >= 200 && response.status < 300) {
+        // Request was successful (2xx range)
+        requestState = RequestState.success;
+      } else if (response.status >= 400 && response.status < 500) {
+        // Client error occurred (4xx range)
+        print('Client error: ${response.status}');
+        throw Exception('Failed to load data due to a client error');
+      } else {
+        // Other errors (e.g., server error 5xx, redirects 3xx)
+        print('Other error: ${response.status}');
+        throw Exception('Failed to load data with status code: ${response.status}');
+      }
     } catch (e) {
-      requestState = RequestState.error;
       message = e.toString();
+      requestState = RequestState.error;
     }
   }
 }
