@@ -1,10 +1,13 @@
+import 'package:asisten_buku_kebun/DI.dart';
 import 'package:asisten_buku_kebun/data/preferences/app_shared_preferences.dart';
 import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routing.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home_widgets/crop_summary_section.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home_widgets/greeting_section.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home_widgets/primary_action_section.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home_widgets/recent_logs_section.dart';
 import 'package:flutter/material.dart';
-import 'package:asisten_buku_kebun/DI.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,12 +19,18 @@ class HomeScreen extends StatefulWidget {
 class _HomePageState extends State<HomeScreen> {
   String name = "";
 
+  @override
+  void initState() {
+    super.initState();
+    _checkLogin();
+  }
+
   Future<void> _checkLogin() async {
     final hasLoggedIn = await AppSharedPreferences.containsKey(
       AppSharedPreferences.userModelKey,
     );
     if (!mounted) return;
-    print("hasLoggedIn: $hasLoggedIn");
+
     if (hasLoggedIn) {
       setState(() {
         name = DI.authPresenter.loggedInUser?.name ?? "";
@@ -32,44 +41,42 @@ class _HomePageState extends State<HomeScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _checkLogin();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Beranda"),
+        actions: [
+          IconButton(
+            color: Colors.red,
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await DI.authPresenter.logout();
+              if (!mounted) return;
+              AppRouting().pushReplacement(AppRoutes.login);
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary900,
         foregroundColor: AppColors.white,
         onPressed: () {
-          // navigate to map screen
           AppRouting().navigateTo(AppRoutes.cropMapScreen);
         },
-        child: Icon(Icons.map),
+        child: const Icon(Icons.map),
       ),
-      body: Center(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          spacing: 20,
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Welcome to home page, $name"),
-            // to crops
-            ElevatedButton(
-              onPressed: () {
-                AppRouting().navigateTo(AppRoutes.myCropsScreen);
-              },
-              child: const Text("Go to My Crops"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await DI.authPresenter.logout();
-                if (!mounted) return;
-                AppRouting().pushReplacement(AppRoutes.login);
-              },
-              child: const Text("Logout"),
-            ),
+            GreetingSection(name: name),
+            const SizedBox(height: 20),
+            const CropSummarySection(),
+            const SizedBox(height: 20),
+            const PrimaryActionsSection(),
+            const SizedBox(height: 24),
+            const RecentLogsSection(),
           ],
         ),
       ),
