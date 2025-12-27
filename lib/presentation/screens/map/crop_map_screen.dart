@@ -28,7 +28,7 @@ class _CropMapScreenState extends State<CropMapScreen> {
 
    LatLng? _currentPosition;
 
-  getLocation() async {
+  _getLocation() async {
     await Permission.locationWhenInUse.request();
     if (await Permission.locationWhenInUse.serviceStatus.isDisabled) {
       return;
@@ -58,7 +58,7 @@ class _CropMapScreenState extends State<CropMapScreen> {
   initState()  {
     super.initState();
 
-    getLocation();
+    _getLocation();
     _getCrops();
   }
 

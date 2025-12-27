@@ -41,33 +41,38 @@ class _HomePageState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary500,
-        child: const Icon(Icons.map),
+        backgroundColor: AppColors.primary900,
+        foregroundColor: AppColors.white,
         onPressed: () {
           // navigate to map screen
           AppRouting().navigateTo(AppRoutes.cropMapScreen);
         },
+        child: Icon(Icons.map),
       ),
-      body: Center(child: Column(
-        children: [
-          Text("Welcome to home page, $name"),
-          // to crops
-          ElevatedButton(
-            onPressed: () {
-              AppRouting().navigateTo(AppRoutes.myCropsScreen);
-            },
-            child: const Text("Go to My Crops"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await DI.authPresenter.logout();
-              if (!mounted) return;
-              AppRouting().pushReplacement(AppRoutes.login);
-            },
-            child: const Text("Logout"),
-          ),
-        ],
-      )),
+      body: Center(
+        child: Column(
+          spacing: 20,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Welcome to home page, $name"),
+            // to crops
+            ElevatedButton(
+              onPressed: () {
+                AppRouting().navigateTo(AppRoutes.myCropsScreen);
+              },
+              child: const Text("Go to My Crops"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await DI.authPresenter.logout();
+                if (!mounted) return;
+                AppRouting().pushReplacement(AppRoutes.login);
+              },
+              child: const Text("Logout"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

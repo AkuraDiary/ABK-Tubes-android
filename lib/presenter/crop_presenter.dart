@@ -27,6 +27,7 @@ class CropPresenter {
           .select()
           .eq('user_id', userId);
       var cropsData = await result.then((value) => value as List<dynamic>);
+      print(cropsData);
       myCrops = cropsData.map((e) => CropModel.fromJson(e)).toList();
       requestState = RequestState.success;
     } catch (e) {
