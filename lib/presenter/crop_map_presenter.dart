@@ -4,12 +4,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CropMapPresenter {
   RequestState requestState = RequestState.initial;
-  List<CropModel> myCrops = [];
+  List<CropModel> allCrops = [];
   String message = '';
 
   void reset() {
     requestState = RequestState.initial;
-    myCrops = [];
+    allCrops = [];
     message = '';
   }
 
@@ -17,9 +17,20 @@ class CropMapPresenter {
     requestState = RequestState.initial;
     try {
       requestState = RequestState.loading;
-      var result = Supabase.instance.client.from('crops').select();
+      var result = Supabase.instance.client.from('crops').select('''
+      crop_id,
+      user_id,
+      crop_name,
+      type,
+      crop_status,
+      location_lat,
+      location_lon,
+      users (
+        name
+      )
+      ''');
       var cropsData = await result.then((value) => value as List<dynamic>);
-      myCrops = cropsData.map((e) => CropModel.fromJson(e)).toList();
+      allCrops = cropsData.map((e) => CropModel.fromJson(e)).toList();
       requestState = RequestState.success;
     } catch (e) {
       requestState = RequestState.error;

@@ -1,10 +1,15 @@
+import 'package:asisten_buku_kebun/data/request_state.dart';
+import 'package:asisten_buku_kebun/presentation/common/util/app_toast.dart';
+import 'package:asisten_buku_kebun/presenter/crop_map_presenter.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CropMapScreen extends StatefulWidget {
-  const CropMapScreen({super.key});
+  CropMapScreen({super.key});
+
+  CropMapPresenter cropMapPresenter = CropMapPresenter();
 
   @override
   State<CropMapScreen> createState() => _CropMapScreenState();
@@ -33,6 +38,13 @@ class _CropMapScreenState extends State<CropMapScreen> {
 
     setState(() {
       _currentPosition = location;
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('You'),
+          position: _currentPosition,
+          infoWindow: const InfoWindow(title: 'You are here'),
+        ),
+      );
     });
   }
 
@@ -43,7 +55,51 @@ class _CropMapScreenState extends State<CropMapScreen> {
     if (await Permission.locationWhenInUse.serviceStatus.isEnabled) {
       getLocation();
     }
+    _getCrops();
   }
+
+  Future<void> _getCrops() async {
+    try {
+      await widget.cropMapPresenter.fetchAllCrop();
+      if (!mounted) return;
+      if (widget.cropMapPresenter.requestState == RequestState.success) {
+        setState(() {
+          for (var crop in widget.cropMapPresenter.allCrops) {
+            if (crop.locationLat == null || crop.locationLon == null) {
+              continue;
+            }
+            _markers.add(
+              Marker(
+                markerId: MarkerId(crop.cropId.toString()),
+                position: LatLng(crop.locationLat!, crop.locationLon!),
+                infoWindow: InfoWindow(
+                  title: crop.cropName,
+                  snippet:
+                      "${crop.type} by ${crop.user?.name} (${crop.cropStatus})",
+                ),
+              ),
+            );
+          }
+        });
+      } else {
+        // Show error message
+        showAppToast(
+          context,
+          widget.cropMapPresenter.message,
+          title: "Terjadi Kesalahan",
+        );
+      }
+    } catch (e) {
+      // Handle errors here
+      showAppToast(
+        context,
+        'Terjadi kesalahan: $e. Silakan coba lagi',
+        title: 'Error Tidak Terduga 😢',
+      );
+    }
+  }
+
+  Set<Marker> _markers = {};
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +107,7 @@ class _CropMapScreenState extends State<CropMapScreen> {
       appBar: AppBar(title: const Text('Google Maps Demo')),
       body: GoogleMap(
         onMapCreated: _onMapCreated,
-        markers: {
-          Marker(
-            markerId: const MarkerId('You'),
-            position: _currentPosition,
-            infoWindow: const InfoWindow(title: 'You are here'),
-          ),
-        },
+        markers: _markers,
         initialCameraPosition: CameraPosition(target: _currentPosition),
         // mapType: MapType.normal,
         myLocationEnabled: true,
