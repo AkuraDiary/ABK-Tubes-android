@@ -3,6 +3,7 @@ import 'package:asisten_buku_kebun/data/model/crop_model.dart';
 import 'package:asisten_buku_kebun/data/request_state.dart';
 import 'package:asisten_buku_kebun/presentation/common/util/app_formatters.dart';
 import 'package:asisten_buku_kebun/presentation/common/util/app_toast.dart';
+import 'package:asisten_buku_kebun/presentation/common/widgets/badge.dart';
 import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
 import 'package:asisten_buku_kebun/presentation/resources/app_constant.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
@@ -93,21 +94,6 @@ class _MyCropsScreenState extends State<MyCropsScreen> {
     }
   }
 
-  Color? _getCropStatusColor(String? cropStatus) {
-    switch (cropStatus) {
-      case AppConstant.CROP_SEHAT:
-        return Colors.green;
-      case AppConstant.CROP_SAKIT:
-        return Colors.yellow;
-      case AppConstant.CROP_MATI:
-        return Colors.red;
-      case AppConstant.CROP_DIPANEN:
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
-  }
-
   Widget _buildCropItem(CropModel crop) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
@@ -125,13 +111,8 @@ class _MyCropsScreenState extends State<MyCropsScreen> {
           widget.cropPresenter.selectedCrop = crop;
           AppRouting().navigateTo(AppRoutes.detailCropScreen);
         },
-        leading: Badge(
-          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-          label: Text(
-            crop.cropStatus ?? "",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          backgroundColor: _getCropStatusColor(crop.cropStatus?.toLowerCase()),
+        leading: statusTanamanBadge(
+          crop.cropStatus,
         ),
         subtitle: Text(
           'Planted on: ${formatDisplayDate(crop.createdAt)}',

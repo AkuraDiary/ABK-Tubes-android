@@ -1,4 +1,5 @@
 import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
+import 'package:asisten_buku_kebun/presentation/resources/app_constant.dart';
 import 'package:flutter/material.dart';
 
 
@@ -20,17 +21,17 @@ Widget textBadge(String badgeText, Color badgeColor, {Color? textColor = AppColo
 Widget statusTanamanBadge(String? status) {
   Color color;
   switch (status?.toLowerCase()) {
-    case "mati":
+    case AppConstant.CROP_MATI:
       color = AppColors.danger700;
       break;
-    case "sakit":
+    case AppConstant.CROP_SAKIT:
       color = AppColors.warning700;
       break;
-    case "dipanen":
-      color = AppColors.secondary200;
+    case AppConstant.CROP_DIPANEN:
+      color = AppColors.info700;
       break;
-    case "sehat":
-      color = AppColors.primary900;
+    case AppConstant.CROP_SEHAT:
+      color = AppColors.success900;
       break;
     default:
       color = Colors.grey;
