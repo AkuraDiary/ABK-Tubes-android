@@ -57,7 +57,6 @@ class _CropMapScreenState extends State<CropMapScreen> {
   @override
   initState()  {
     super.initState();
-
     _getLocation();
     _getCrops();
   }

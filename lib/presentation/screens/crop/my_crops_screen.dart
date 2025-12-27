@@ -26,6 +26,7 @@ class _MyCropsScreenState extends State<MyCropsScreen> {
   @override
   void initState() {
     super.initState();
+    widget.cropPresenter.selectedCrop = null;
     _getMyCrops();
   }
 
@@ -38,6 +39,7 @@ class _MyCropsScreenState extends State<MyCropsScreen> {
         foregroundColor: AppColors.white,
         onPressed: () {
           // Navigate to add crop screen
+          widget.cropPresenter.selectedCrop = null;
           AppRouting().navigateTo(AppRoutes.addEditCropScreen);
         },
         child: const Icon(Icons.add),
