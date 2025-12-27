@@ -4,7 +4,7 @@ import 'package:asisten_buku_kebun/presentation/screens/crop/add_edit_crop_scree
 import 'package:asisten_buku_kebun/presentation/screens/crop/crop_log/create_log_screen.dart';
 import 'package:asisten_buku_kebun/presentation/screens/crop/detail_crop_screen.dart';
 import 'package:asisten_buku_kebun/presentation/screens/crop/my_crops_screen.dart';
-import 'package:asisten_buku_kebun/presentation/screens/home_screen.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home/home_screen.dart';
 import 'package:asisten_buku_kebun/presentation/screens/map/crop_map_screen.dart';
 import 'package:flutter/material.dart';
 

@@ -3,10 +3,10 @@ import 'package:asisten_buku_kebun/data/preferences/app_shared_preferences.dart'
 import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routing.dart';
-import 'package:asisten_buku_kebun/presentation/screens/home_widgets/crop_summary_section.dart';
-import 'package:asisten_buku_kebun/presentation/screens/home_widgets/greeting_section.dart';
-import 'package:asisten_buku_kebun/presentation/screens/home_widgets/primary_action_section.dart';
-import 'package:asisten_buku_kebun/presentation/screens/home_widgets/recent_logs_section.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home/widgets/crop_summary_section.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home/widgets/greeting_section.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home/widgets/primary_action_section.dart';
+import 'package:asisten_buku_kebun/presentation/screens/home/widgets/recent_logs_section.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {

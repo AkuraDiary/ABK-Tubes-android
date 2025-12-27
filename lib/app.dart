@@ -3,7 +3,7 @@ import 'package:asisten_buku_kebun/presentation/routing/app_routing.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/home/home_screen.dart';
 
 class App extends StatelessWidget {
 
