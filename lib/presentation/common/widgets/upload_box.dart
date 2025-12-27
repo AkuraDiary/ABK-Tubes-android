@@ -16,13 +16,7 @@ class UploadBox extends StatelessWidget {
       onTap: onTap,
       child: DottedBorder(
         options: const RoundedRectDottedBorderOptions(radius: Radius.circular(10)),
-        // options: DottedBorderOptions(
-        //   borderType: ,
-        //   color: AppColors.primary500,
-        //   dashPattern: const [8, 4],
-        //   strokeWidth: 1.5,  
-        // ),
-        //
+
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 24),

@@ -20,15 +20,13 @@ class CropLogCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              formatDisplayDate(log.createdAt),
-              style: bold12,
-            ),
+            Text(formatDisplayDate(log.createdAt), style: bold12),
             const SizedBox(height: 8),
             if (log.logTag != null)
               textBadge(
                 log.logTag!,
-                AppColors.warning100,
+                getColorForStatus(log.logTag!),
+                textColor: Colors.white,
               ),
             if (log.notes != null && log.notes!.isNotEmpty) ...[
               const SizedBox(height: 8),

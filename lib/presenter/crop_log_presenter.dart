@@ -1,6 +1,8 @@
+import 'dart:typed_data';
 import 'package:asisten_buku_kebun/data/model/crop_log_model.dart';
 import 'package:asisten_buku_kebun/data/request_state.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CropLogPresenter {
@@ -40,28 +42,26 @@ class CropLogPresenter {
     requestState = RequestState.initial;
     try {
       requestState = RequestState.loading;
-
-
-      final bytes = await photo.readAsBytes();
+      final compressedBytes = await compressImageBytes(photo.path);
       final response = await Supabase.instance.client.functions.invoke(
         'log-crop-update',
         body: {
           'crop_id': cropId,
           'notes': notes,
           'tag': tag,
-          'file': bytes,
+          'file': compressedBytes,
         },
       );
 
       if (response.status >= 200 && response.status < 300) {
-        // Request was successful (2xx range)
+
         requestState = RequestState.success;
       } else if (response.status >= 400 && response.status < 500) {
-        // Client error occurred (4xx range)
+
         print('Client error: ${response.status}');
         throw Exception('Failed to load data due to a client error');
       } else {
-        // Other errors (e.g., server error 5xx, redirects 3xx)
+
         print('Other error: ${response.status}');
         throw Exception('Failed to load data with status code: ${response.status}');
       }
@@ -69,5 +69,21 @@ class CropLogPresenter {
       message = e.toString();
       requestState = RequestState.error;
     }
+  }
+
+
+  Future<Uint8List> compressImageBytes(String filePath) async {
+    final result = await FlutterImageCompress.compressWithFile(
+      filePath,
+      minWidth: 1024,
+      quality: 70,
+      format: CompressFormat.jpeg,
+    );
+
+    if (result == null) {
+      throw Exception('Failed to compress image');
+    }
+
+    return result;
   }
 }
