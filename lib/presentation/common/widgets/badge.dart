@@ -1,8 +1,6 @@
 import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
 import 'package:asisten_buku_kebun/presentation/resources/app_constant.dart';
 import 'package:flutter/material.dart';
-
-
 import '../../resources/text_styles_resources.dart';
 
 Widget textBadge(String badgeText, Color badgeColor, {Color? textColor = AppColors.primary900}) {
@@ -18,25 +16,23 @@ Widget textBadge(String badgeText, Color badgeColor, {Color? textColor = AppColo
   );
 }
 
-Widget statusTanamanBadge(String? status) {
-  Color color;
+Color getColorForStatus(String? status) {
   switch (status?.toLowerCase()) {
     case AppConstant.CROP_MATI:
-      color = AppColors.danger700;
-      break;
+      return AppColors.danger700;
     case AppConstant.CROP_SAKIT:
-      color = AppColors.warning700;
-      break;
+      return AppColors.warning700;
     case AppConstant.CROP_DIPANEN:
-      color = AppColors.info700;
-      break;
+      return AppColors.info700;
     case AppConstant.CROP_SEHAT:
-      color = AppColors.success900;
-      break;
+      return AppColors.success900;
     default:
-      color = Colors.grey;
+      return Colors.grey;
   }
+}
 
+Widget statusTanamanBadge(String? status) {
+  Color color = getColorForStatus(status);
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
     decoration: BoxDecoration(
