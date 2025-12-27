@@ -39,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
           context,
           'Login berhasil! Selamat datang kembali.',
           title: 'Sukses 🎉',
+           isError: false,
         );
         AppRouting().pushReplacement(AppRoutes.home);
       } else {

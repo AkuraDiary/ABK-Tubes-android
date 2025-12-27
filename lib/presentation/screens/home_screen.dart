@@ -1,4 +1,5 @@
 import 'package:asisten_buku_kebun/data/preferences/app_shared_preferences.dart';
+import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routing.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomeScreen> {
-  // final _future = AppSharedPreferences.containsKey(AppSharedPreferences.userModelKey);//Supabase.instance.client.from('users').select();
-
   String name = "";
 
   Future<void> _checkLogin() async {
@@ -27,7 +26,6 @@ class _HomePageState extends State<HomeScreen> {
       setState(() {
         name = DI.authPresenter.loggedInUser?.name ?? "";
       });
-      // AppRouting().pushReplacement(AppRoutes.home);
     } else {
       AppRouting().pushReplacement(AppRoutes.login);
     }
@@ -41,6 +39,35 @@ class _HomePageState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text("Welcome to home page, $name")));
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary500,
+        child: const Icon(Icons.map),
+        onPressed: () {
+          // navigate to map screen
+          AppRouting().navigateTo(AppRoutes.cropMapScreen);
+        },
+      ),
+      body: Center(child: Column(
+        children: [
+          Text("Welcome to home page, $name"),
+          // to crops
+          ElevatedButton(
+            onPressed: () {
+              AppRouting().navigateTo(AppRoutes.myCropsScreen);
+            },
+            child: const Text("Go to My Crops"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await DI.authPresenter.logout();
+              if (!mounted) return;
+              AppRouting().pushReplacement(AppRoutes.login);
+            },
+            child: const Text("Logout"),
+          ),
+        ],
+      )),
+    );
   }
 }

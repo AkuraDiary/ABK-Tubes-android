@@ -72,6 +72,7 @@ class AuthPresenter{
     if (loggedInUser != null) {
       requestState = RequestState.success;
       // If the login is successful, return true
+      authenticate();
       return true;
     } else {
       requestState = RequestState.error;

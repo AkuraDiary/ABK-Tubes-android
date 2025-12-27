@@ -1,5 +1,7 @@
+import 'package:asisten_buku_kebun/DI.dart';
 import 'package:asisten_buku_kebun/data/request_state.dart';
 import 'package:asisten_buku_kebun/presentation/common/util/app_toast.dart';
+import 'package:asisten_buku_kebun/presentation/resources/app_constant.dart';
 import 'package:asisten_buku_kebun/presenter/crop_map_presenter.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -9,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 class CropMapScreen extends StatefulWidget {
   CropMapScreen({super.key});
 
-  CropMapPresenter cropMapPresenter = CropMapPresenter();
+  CropMapPresenter cropMapPresenter = DI.cropMapPresenter;
 
   @override
   State<CropMapScreen> createState() => _CropMapScreenState();
@@ -24,9 +26,13 @@ class _CropMapScreenState extends State<CropMapScreen> {
     });
   }
 
-  late LatLng _currentPosition;
+   LatLng? _currentPosition;
 
   getLocation() async {
+    await Permission.locationWhenInUse.request();
+    if (await Permission.locationWhenInUse.serviceStatus.isDisabled) {
+      return;
+    }
     LocationPermission permission;
     permission = await Geolocator.requestPermission();
 
@@ -41,7 +47,7 @@ class _CropMapScreenState extends State<CropMapScreen> {
       _markers.add(
         Marker(
           markerId: const MarkerId('You'),
-          position: _currentPosition,
+          position: _currentPosition!,
           infoWindow: const InfoWindow(title: 'You are here'),
         ),
       );
@@ -49,12 +55,10 @@ class _CropMapScreenState extends State<CropMapScreen> {
   }
 
   @override
-  Future<void> initState() async {
+  initState()  {
     super.initState();
-    await Permission.locationWhenInUse.request();
-    if (await Permission.locationWhenInUse.serviceStatus.isEnabled) {
-      getLocation();
-    }
+
+    getLocation();
     _getCrops();
   }
 
@@ -72,10 +76,20 @@ class _CropMapScreenState extends State<CropMapScreen> {
               Marker(
                 markerId: MarkerId(crop.cropId.toString()),
                 position: LatLng(crop.locationLat!, crop.locationLon!),
+                draggable: false,
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                  // You can customize the marker color based on crop status
+                    crop.cropStatus == AppConstant.CROP_SEHAT
+                        ? BitmapDescriptor.hueGreen
+                        : crop.cropStatus == AppConstant.CROP_SAKIT
+                        ? BitmapDescriptor.hueYellow :
+                    crop.cropStatus == AppConstant.CROP_MATI ? BitmapDescriptor
+                        .hueRed : BitmapDescriptor.hueOrange
+                ),
                 infoWindow: InfoWindow(
                   title: crop.cropName,
                   snippet:
-                      "${crop.type} by ${crop.user?.name} (${crop.cropStatus})",
+                  "${crop.type} by ${crop.user?.name} (${crop.cropStatus})",
                 ),
               ),
             );
@@ -104,11 +118,11 @@ class _CropMapScreenState extends State<CropMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Google Maps Demo')),
+      appBar: AppBar(title: const Text('Crops Map')),
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         markers: _markers,
-        initialCameraPosition: CameraPosition(target: _currentPosition),
+        initialCameraPosition: CameraPosition(target: _currentPosition ?? LatLng(-6.200000, 106.816666), zoom: 12),
         // mapType: MapType.normal,
         myLocationEnabled: true,
         myLocationButtonEnabled: true,

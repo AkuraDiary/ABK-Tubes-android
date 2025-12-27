@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:asisten_buku_kebun/data/model/user_model.dart';
 
 class CropModel {
