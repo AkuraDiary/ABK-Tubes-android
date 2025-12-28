@@ -32,20 +32,23 @@ class _MyCropsScreenState extends State<MyCropsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Crops')),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary900,
-        foregroundColor: AppColors.white,
-        onPressed: () {
-          // Navigate to add crop screen
-          widget.cropPresenter.selectedCrop = null;
-          AppRouting().navigateTo(AppRoutes.addEditCropScreen);
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: SingleChildScrollView(
-        child: ListView(
+    return RefreshIndicator(
+      onRefresh: () async {
+        _getMyCrops();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('My Crops')),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.primary900,
+          foregroundColor: AppColors.white,
+          onPressed: () {
+            // Navigate to add crop screen
+            widget.cropPresenter.selectedCrop = null;
+            AppRouting().navigateTo(AppRoutes.addEditCropScreen);
+          },
+          child: const Icon(Icons.add),
+        ),
+        body: ListView(
           shrinkWrap: true,
           children: [
             if (widget.cropPresenter.requestState == RequestState.loading)

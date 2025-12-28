@@ -90,6 +90,7 @@ class AuthPresenter{
   }
 
   Future<void> authenticate() async{
+    print("Authenticating user...");
     // save the logged in user to local storage
     if (loggedInUser != null) {
       await AppSharedPreferences.setUserModel(

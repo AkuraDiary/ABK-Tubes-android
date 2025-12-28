@@ -20,6 +20,7 @@ class CropPresenter {
 
   Future<void> fetchMyCrops(String userId) async {
     requestState = RequestState.initial;
+
     try {
       requestState = RequestState.loading;
       var result = Supabase.instance.client
@@ -36,12 +37,21 @@ class CropPresenter {
     }
   }
 
-  Future<void> addCrop(CropModel crop) async {
+  Future<void> addCrop(CropModel crop, String userId) async {
     requestState = RequestState.initial;
     try {
       requestState = RequestState.loading;
-      // var result =
-      await Supabase.instance.client.from('crops').insert(crop.toJson()).select().single();
+      print(crop);
+      await Supabase.instance.client.from('crops').insert(
+      {
+        'user_id': userId,
+        'crop_name': crop.cropName,
+        'type': crop.type,
+        'crop_status': crop.cropStatus,
+        'location_lat': crop.locationLat?.toDouble(),
+        'location_lon': crop.locationLon?.toDouble(),
+      }
+      ).select().single();
       // CropModel? resultData = CropModel.fromJson(result);
       requestState = RequestState.success;
     } catch (e) {
@@ -53,12 +63,13 @@ class CropPresenter {
   Future<void> editCrop(CropModel crop) async {
     requestState = RequestState.initial;
     try {
+      print(crop);
+      print(crop.toJson());
       requestState = RequestState.loading;
       await Supabase.instance.client
           .from('crops')
           .update(crop.toJson())
           .eq('crop_id', crop.cropId!).select().single();
-
 
       requestState = RequestState.success;
     } catch (e) {

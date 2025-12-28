@@ -17,6 +17,7 @@ class AppSharedPreferences {
     try{
       debugPrint("getusermodel");
       final userModelJson = jsonDecode(prefs.getString(userModelKey).toString() ?? '');
+      print("User Model JSON Preferences : "+ userModelJson.toString());
       if (userModelJson != null) {
         UserModel model =  UserModel.fromJson(userModelJson as Map<String, dynamic>);
         // debugPrint("User Model Preferences : "+ model.toString());
@@ -32,7 +33,7 @@ class AppSharedPreferences {
 
   static Future<bool> setUserModel(UserModel userModel) async {
     final prefs = await _instance;
-    return prefs.setString(userModelKey,  jsonEncode(userModel.toJson()));
+    return prefs.setString(userModelKey,  jsonEncode(userModel));
   }
 
   static Future<bool> clearPreferences() async {

@@ -1,3 +1,4 @@
+import 'package:asisten_buku_kebun/DI.dart';
 import 'package:asisten_buku_kebun/presentation/common/widgets/app_button.dart';
 import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
@@ -37,6 +38,7 @@ class PrimaryActionsSection extends StatelessWidget {
                 outlineColor: AppColors.primary900,
                 buttonType: AppButtonType.outlined,
                 onPressed: () {
+                  DI.cropPresenter.selectedCrop=null;
                   AppRouting().navigateTo(AppRoutes.addEditCropScreen);
                 },
               ),

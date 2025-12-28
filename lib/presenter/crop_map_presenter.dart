@@ -30,7 +30,9 @@ class CropMapPresenter {
       )
       ''');
       var cropsData = await result.then((value) => value as List<dynamic>);
+      print(cropsData);
       allCrops = cropsData.map((e) => CropModel.fromJson(e)).toList();
+      print("All Crops: " + allCrops.toString());
       requestState = RequestState.success;
     } catch (e) {
       requestState = RequestState.error;

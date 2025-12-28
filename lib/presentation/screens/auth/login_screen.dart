@@ -35,6 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (!mounted) return;
       if (success) {
+        widget.authPresenter.authenticate();
         showAppToast(
           context,
           'Login berhasil! Selamat datang kembali.',

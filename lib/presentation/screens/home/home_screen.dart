@@ -25,13 +25,17 @@ class _HomePageState extends State<HomeScreen> {
     _checkLogin();
   }
 
+  int refreshTick = 0;
+
+
   Future<void> _checkLogin() async {
+    print("checking login");
     final hasLoggedIn = await AppSharedPreferences.containsKey(
       AppSharedPreferences.userModelKey,
     );
     if (!mounted) return;
-
     if (hasLoggedIn) {
+      DI.authPresenter.loggedInUser = await AppSharedPreferences.getUserModel();
       setState(() {
         name = DI.authPresenter.loggedInUser?.name ?? "";
       });
@@ -42,42 +46,55 @@ class _HomePageState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Beranda"),
-        actions: [
-          IconButton(
-            color: Colors.red,
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await DI.authPresenter.logout();
-              if (!mounted) return;
-              AppRouting().pushReplacement(AppRoutes.login);
-            },
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary900,
-        foregroundColor: AppColors.white,
-        onPressed: () {
-          AppRouting().navigateTo(AppRoutes.cropMapScreen);
-        },
-        child: const Icon(Icons.map),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GreetingSection(name: name),
-            const SizedBox(height: 20),
-            CropSummarySection(),
-            const SizedBox(height: 20),
-            const PrimaryActionsSection(),
-            const SizedBox(height: 24),
-             RecentLogsSection(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Beranda"),
+          actions: [
+            IconButton(
+              color: Colors.red,
+              icon: const Icon(Icons.logout),
+              onPressed: () async {
+                await DI.authPresenter.logout();
+                if (!mounted) return;
+                AppRouting().pushReplacement(AppRoutes.login);
+              },
+            ),
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.primary900,
+          foregroundColor: AppColors.white,
+          onPressed: () {
+            AppRouting().navigateTo(AppRoutes.cropMapScreen);
+          },
+          child: const Icon(Icons.map),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              refreshTick++;
+            });
+          },
+          child: DI.authPresenter.loggedInUser==null ?   const Center(child: CircularProgressIndicator()) : Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GreetingSection(name: name),
+                const SizedBox(height: 20),
+                CropSummarySection(
+                  key: ValueKey("summary-$refreshTick"),
+                ),
+                const SizedBox(height: 20),
+                const PrimaryActionsSection(),
+                const SizedBox(height: 24),
+                RecentLogsSection(
+                  key: ValueKey("log-$refreshTick"),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

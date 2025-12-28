@@ -1,4 +1,6 @@
 import 'package:asisten_buku_kebun/DI.dart';
+import 'package:asisten_buku_kebun/data/model/crop_model.dart';
+import 'package:asisten_buku_kebun/data/request_state.dart';
 import 'package:asisten_buku_kebun/presentation/common/widgets/app_button.dart';
 import 'package:asisten_buku_kebun/presentation/common/widgets/dropdown_field.dart';
 import 'package:asisten_buku_kebun/presentation/common/widgets/input_field.dart';
@@ -11,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import '../../common/util/app_toast.dart' show showAppToast;
 
 class AddEditCropScreen extends StatefulWidget {
   CropPresenter cropPresenter = DI.cropPresenter;
@@ -27,8 +31,11 @@ class _AddEditCropScreenState extends State<AddEditCropScreen> {
   final TextEditingController cropNameController = TextEditingController();
   final TextEditingController latController = TextEditingController();
   final TextEditingController lonController = TextEditingController();
-  String selectedCropType = '';
-  String selectedCropStatus = '';
+  final TextEditingController statusController = TextEditingController();
+  final TextEditingController typeController = TextEditingController();
+
+  // String selectedCropType = '';
+  // String selectedCropStatus = '';
 
   final List<String> cropTypes = [
     'Sayur',
@@ -56,14 +63,15 @@ class _AddEditCropScreenState extends State<AddEditCropScreen> {
       cropNameController.text = crop.cropName ?? '';
       latController.text = crop.locationLat?.toString() ?? '';
       lonController.text = crop.locationLon?.toString() ?? '';
-      selectedCropType = crop.type ?? '';
-      selectedCropStatus = crop.cropStatus ?? '';
+      typeController.text = crop.type ?? '';
+      statusController.text = crop.cropStatus?.toLowerCase() ?? '';
     }
   }
-  bool isEdit =false;
+
+  bool isEdit = false;
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -81,8 +89,8 @@ class _AddEditCropScreenState extends State<AddEditCropScreen> {
               cropNameController: cropNameController,
               cropTypes: cropTypes,
               cropStatuses: cropStatuses,
-              selectedType: isEdit ? selectedCropType : null,
-              selectedStatus: isEdit ? selectedCropStatus.toLowerCase() : null,
+              cropTypeController: typeController,
+              cropStatusController: statusController,
             ),
             const SizedBox(height: 24),
             _CropLocationSection(
@@ -94,7 +102,29 @@ class _AddEditCropScreenState extends State<AddEditCropScreen> {
               onSave: () {
                 if (_formKey.currentState?.validate() ?? false) {
                   if (isEdit) {
-                  } else {}
+                    CropModel editedCrop = widget.cropPresenter.selectedCrop!;
+                    editedCrop.cropName = cropNameController.text;
+                    editedCrop.type = typeController.text;
+                    editedCrop.cropStatus = statusController.text;
+                    editedCrop.locationLat = double.tryParse(
+                      latController.text,
+                    );
+                    editedCrop.locationLon = double.tryParse(
+                      lonController.text,
+                    );
+
+                    _editCrop(editedCrop);
+                  } else {
+                    CropModel newCrop = CropModel(
+                      cropName: cropNameController.text,
+                      type: typeController.text,
+                      cropStatus: statusController.text,
+                      locationLat: double.tryParse(latController.text),
+                      locationLon: double.tryParse(lonController.text),
+                    );
+
+                    _addCrop(newCrop);
+                  }
                 }
               },
               onCancel: () {
@@ -107,21 +137,79 @@ class _AddEditCropScreenState extends State<AddEditCropScreen> {
       ),
     );
   }
+
+  Future<void> _editCrop(CropModel editedCrop) async {
+    try {
+      await widget.cropPresenter.editCrop(editedCrop);
+      if (!mounted) return;
+      if (widget.cropPresenter.requestState == RequestState.success) {
+        // Successfully fetched crop logs, you can update the UI accordingly
+        showAppToast(
+          context,
+          'Tanaman Berhasil Diedit',
+          title: 'Berhasil',
+          isError: false,
+        );
+      }
+    } catch (e) {
+      showAppToast(
+        context,
+        'Terjadi kesalahan: $e. Silakan coba lagi',
+        title: 'Error Tidak Terduga 😢',
+      );
+    }
+  }
+
+  Future<void> _addCrop(CropModel newCrop) async {
+    try {
+      await widget.cropPresenter.addCrop(
+        newCrop,
+        DI.authPresenter.loggedInUser?.id ?? "",
+      );
+      if (!mounted) return;
+      if (widget.cropPresenter.requestState == RequestState.success) {
+        // Successfully fetched crop logs, you can update the UI accordingly
+        showAppToast(
+          context,
+          'Tanaman Berhasil Ditambahkan',
+          title: 'Berhasil',
+          isError: false,
+        );
+        // setState(() {
+        //
+        // });
+      } else {
+        showAppToast(
+          context,
+          'Terjadi Kesalahan : ${widget.cropPresenter.message}',
+          title: 'Gagal ❌',
+        );
+      }
+    } catch (e) {
+      showAppToast(
+        context,
+        'Terjadi kesalahan: $e. Silakan coba lagi',
+        title: 'Error Tidak Terduga 😢',
+      );
+    }
+  }
 }
 
 class _CropInfoSection extends StatelessWidget {
   final TextEditingController cropNameController;
+  final TextEditingController cropStatusController;
+  final TextEditingController cropTypeController;
   final List<String> cropTypes;
   final List<String> cropStatuses;
-  String? selectedType;
-  String? selectedStatus;
+
 
   _CropInfoSection({
     required this.cropNameController,
+    required this.cropStatusController,
+    required this.cropTypeController,
     required this.cropTypes,
     required this.cropStatuses,
-    this.selectedType,
-    this.selectedStatus,
+
   });
 
   @override
@@ -143,24 +231,24 @@ class _CropInfoSection extends StatelessWidget {
         DropdownField<String>(
           label: "Jenis Tanaman",
           hint: "Pilih jenis tanaman",
-          value: selectedType,
+          value: cropTypeController.text == '' ? null : cropTypeController.text,
           items: cropTypes
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
           onChanged: (val) {
-            selectedType = val;
+            cropTypeController.text = val ?? "";
           },
         ),
 
         DropdownField<String>(
           label: "Status Tanaman",
           hint: "Pilih status",
-          value: selectedStatus,
+          value: cropStatusController.text == '' ? null : cropStatusController.text,
           items: cropStatuses
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
           onChanged: (val) {
-            selectedStatus = val;
+            cropStatusController.text = val ?? '';
           },
         ),
       ],
@@ -182,9 +270,12 @@ class _CropLocationSection extends StatefulWidget {
 }
 
 class _CropLocationSectionState extends State<_CropLocationSection> {
-  // LatLng? _currentPosition;
+  bool isLoading = false;
 
   Future<void> _getLocation() async {
+    setState(() {
+      isLoading = true;
+    });
     await Permission.locationWhenInUse.request();
     if (await Permission.locationWhenInUse.serviceStatus.isDisabled) {
       return;
@@ -195,6 +286,7 @@ class _CropLocationSectionState extends State<_CropLocationSection> {
     Position position = await Geolocator.getCurrentPosition();
     if (!mounted) return;
     setState(() {
+      isLoading = false;
       double lat = position.latitude;
       double long = position.longitude;
       // LatLng location = LatLng(lat, long);
@@ -206,47 +298,48 @@ class _CropLocationSectionState extends State<_CropLocationSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Lokasi Tanaman", style: semibold14),
-        const SizedBox(height: 12),
-
-        Row(
-          children: [
-            Expanded(
-              child: InputField(
-                label: "Latitude",
-                hint: "-7.2575",
-                controller: widget.latController,
-                isDisabled: true,
-                isGrayed: true,
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Lokasi Tanaman", style: semibold14),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: InputField(
+                      label: "Latitude",
+                      hint: "",
+                      controller: widget.latController,
+                      isDisabled: true,
+                      isGrayed: true,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: InputField(
+                      label: "Longitude",
+                      hint: "",
+                      controller: widget.lonController,
+                      isDisabled: true,
+                      isGrayed: true,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: InputField(
-                label: "Longitude",
-                hint: "112.7521",
-                controller: widget.lonController,
-                isDisabled: true,
-                isGrayed: true,
-              ),
-            ),
-          ],
-        ),
 
-        AppButton(
-          buttonText: "Pilih Lokasi Saat Ini",
-          buttonType: AppButtonType.outlined,
-          outlineColor: AppColors.primary900,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          onPressed: () {
-            _getLocation();
-          },
-        ),
-      ],
-    );
+              AppButton(
+                buttonText: "Pilih Lokasi Saat Ini",
+                buttonType: AppButtonType.outlined,
+                outlineColor: AppColors.primary900,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                onPressed: () {
+                  _getLocation();
+                },
+              ),
+            ],
+          );
   }
 }
 

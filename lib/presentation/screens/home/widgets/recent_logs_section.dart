@@ -17,6 +17,7 @@ class RecentLogsSection extends StatefulWidget {
 }
 
 class _RecentLogsSectionState extends State<RecentLogsSection> {
+
   List<CropLogModel> _latestLogs = [];
 
   Future<void> _fetchLatestLogs() async {
@@ -70,21 +71,19 @@ class _RecentLogsSectionState extends State<RecentLogsSection> {
                   "Belum ada catatan terbaru",
                   style: TextStyle(color: Colors.grey),
                 )
-              : SingleChildScrollView(
-                  child: ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: _latestLogs
-                        .map(
-                          (log) => ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(log.notes ?? ""),
-                            subtitle: Text(formatDisplayDate(log.createdAt)),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
+              : ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: _latestLogs
+                    .map(
+                      (log) => ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(log.notes ?? ""),
+                        subtitle: Text(formatDisplayDate(log.createdAt)),
+                      ),
+                    )
+                    .toList(),
+              ),
         ),
       ],
     );

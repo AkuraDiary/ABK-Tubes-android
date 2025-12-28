@@ -26,7 +26,7 @@ class _CropMapScreenState extends State<CropMapScreen> {
     });
   }
 
-   LatLng? _currentPosition;
+  LatLng? _currentPosition;
 
   _getLocation() async {
     await Permission.locationWhenInUse.request();
@@ -55,10 +55,10 @@ class _CropMapScreenState extends State<CropMapScreen> {
   }
 
   @override
-  initState()  {
+  initState() {
     super.initState();
     _getLocation();
-    _getCrops();
+    // _getCrops();
   }
 
   Future<void> _getCrops() async {
@@ -70,28 +70,30 @@ class _CropMapScreenState extends State<CropMapScreen> {
           for (var crop in widget.cropMapPresenter.allCrops) {
             if (crop.locationLat == null || crop.locationLon == null) {
               continue;
-            }
-            _markers.add(
-              Marker(
-                markerId: MarkerId(crop.cropId.toString()),
-                position: LatLng(crop.locationLat!, crop.locationLon!),
-                draggable: false,
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                  // You can customize the marker color based on crop status
+            } else {
+              _markers.add(
+                Marker(
+                  markerId: MarkerId(crop.cropId.toString()),
+                  position: LatLng(crop.locationLat!, crop.locationLon!),
+                  draggable: false,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                    // You can customize the marker color based on crop status
                     crop.cropStatus == AppConstant.CROP_SEHAT
                         ? BitmapDescriptor.hueGreen
                         : crop.cropStatus == AppConstant.CROP_SAKIT
-                        ? BitmapDescriptor.hueYellow :
-                    crop.cropStatus == AppConstant.CROP_MATI ? BitmapDescriptor
-                        .hueRed : BitmapDescriptor.hueOrange
+                        ? BitmapDescriptor.hueYellow
+                        : crop.cropStatus == AppConstant.CROP_MATI
+                        ? BitmapDescriptor.hueRed
+                        : BitmapDescriptor.hueOrange,
+                  ),
+                  infoWindow: InfoWindow(
+                    title: crop.cropName,
+                    snippet:
+                        "${crop.type} by ${crop.user?.name} (${crop.cropStatus})",
+                  ),
                 ),
-                infoWindow: InfoWindow(
-                  title: crop.cropName,
-                  snippet:
-                  "${crop.type} by ${crop.user?.name} (${crop.cropStatus})",
-                ),
-              ),
-            );
+              );
+            }
           }
         });
       } else {
@@ -121,7 +123,10 @@ class _CropMapScreenState extends State<CropMapScreen> {
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         markers: _markers,
-        initialCameraPosition: CameraPosition(target: _currentPosition ?? LatLng(-6.200000, 106.816666), zoom: 12),
+        initialCameraPosition: CameraPosition(
+          target: _currentPosition ?? LatLng(-6.200000, 106.816666),
+          zoom: 12,
+        ),
         // mapType: MapType.normal,
         myLocationEnabled: true,
         myLocationButtonEnabled: true,

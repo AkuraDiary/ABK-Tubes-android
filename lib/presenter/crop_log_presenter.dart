@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:asisten_buku_kebun/data/model/crop_log_model.dart';
 import 'package:asisten_buku_kebun/data/request_state.dart';
@@ -59,7 +60,8 @@ class CropLogPresenter {
       var result = await Supabase.instance.client
           .from('crop_logs')
           .select()
-          .eq('crop_id', cropId);
+          .eq('crop_id', cropId)
+          .order('created_at', ascending: false);
       var logsData = result as List<dynamic>;
       cropLogs = logsData.map((e) => CropLogModel.fromJson(e)).toList();
       requestState = RequestState.success;
@@ -85,7 +87,7 @@ class CropLogPresenter {
           'crop_id': cropId,
           'notes': notes,
           'tag': tag,
-          'file': compressedBytes,
+          'file': base64Encode(compressedBytes),
         },
       );
 
