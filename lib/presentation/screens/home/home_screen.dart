@@ -95,12 +95,11 @@ class _HomePageState extends State<HomeScreen> with RouteAware {
   }
 
   @override
-  Future<void> didPopNext() async {
+  void didPopNext() {
     _fetchLatestLogs();
     _calculateCropSummary();
   }
 
-  int refreshTick = 0;
 
   Future<void> _checkLogin() async {
     print("checking login");
@@ -145,10 +144,9 @@ class _HomePageState extends State<HomeScreen> with RouteAware {
           child: const Icon(Icons.map),
         ),
         body: RefreshIndicator(
-          onRefresh: () async {
-            setState(() {
-              refreshTick++;
-            });
+          onRefresh: ()  async {
+            _fetchLatestLogs();
+            _calculateCropSummary();
           },
           child: DI.authPresenter.loggedInUser == null
               ? const Center(child: CircularProgressIndicator())
