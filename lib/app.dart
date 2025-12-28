@@ -5,14 +5,18 @@ import 'package:flutter/material.dart';
 
 import 'presentation/screens/home/home_screen.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 class App extends StatelessWidget {
 
-  const App({super.key});
+   App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Instruments',
+      navigatorObservers: [
+        routeObserver
+      ],
       debugShowCheckedModeBanner: false,
       navigatorKey: AppRouting.navigatorKey,
       initialRoute: AppRoutes.home,

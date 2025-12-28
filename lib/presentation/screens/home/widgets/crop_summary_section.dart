@@ -6,30 +6,20 @@ import 'package:asisten_buku_kebun/presenter/auth_presenter.dart';
 import 'package:asisten_buku_kebun/presenter/crop_presenter.dart';
 import 'package:flutter/material.dart';
 
-class CropSummarySection extends StatefulWidget {
-  CropPresenter cropPresenter = DI.cropPresenter;
-  AuthPresenter authPresenter = DI.authPresenter;
-
-  CropSummarySection({super.key});
-
-  @override
-  State<CropSummarySection> createState() => _CropSummarySectionState();
-}
-
-class _CropSummarySectionState extends State<CropSummarySection> {
-
+class CropSummarySection extends StatelessWidget {
   int totalCrops = 0;
   int sickCrops = 0;
-  @override
-  void initState() {
-    super.initState();
-    _calculateCropSummary();
-  }
+
+  CropSummarySection({
+    super.key,
+    required this.totalCrops,
+    required this.sickCrops,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children:  [
+      children: [
         Expanded(
           child: SummaryCard(
             title: "Total Tanaman",
@@ -49,27 +39,6 @@ class _CropSummarySectionState extends State<CropSummarySection> {
         ),
       ],
     );
-  }
-
-  Future<void> _calculateCropSummary()  async {
-    try{
-      final userId = widget.authPresenter.loggedInUser?.id;
-      if (userId != null) {
-        await widget.cropPresenter.fetchMyCrops(userId);
-        if(!mounted) return;
-        setState(() {
-          totalCrops = widget.cropPresenter.myCrops.length;
-          sickCrops = widget.cropPresenter.myCrops.where((crop) => crop.cropStatus == AppConstant.CROP_SAKIT).length;
-        });
-      }
-    }catch(e){
-      if(!mounted) return;
-      showAppToast(
-        context,
-        'Terjadi Kesalahan : ${widget.cropPresenter.message}',
-        title: 'Gagal ❌',
-      );
-    }
   }
 }
 

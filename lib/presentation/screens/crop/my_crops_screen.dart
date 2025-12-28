@@ -12,6 +12,8 @@ import 'package:asisten_buku_kebun/presenter/auth_presenter.dart';
 import 'package:asisten_buku_kebun/presenter/crop_presenter.dart';
 import 'package:flutter/material.dart';
 
+import '../../../app.dart' show routeObserver;
+
 class MyCropsScreen extends StatefulWidget {
   AuthPresenter authPresenter = DI.authPresenter;
   CropPresenter cropPresenter = DI.cropPresenter;
@@ -22,12 +24,31 @@ class MyCropsScreen extends StatefulWidget {
   State<MyCropsScreen> createState() => _MyCropsScreenState();
 }
 
-class _MyCropsScreenState extends State<MyCropsScreen> {
+class _MyCropsScreenState extends State<MyCropsScreen>  with RouteAware{
   @override
   void initState() {
     super.initState();
     widget.cropPresenter.selectedCrop = null;
     _getMyCrops();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {
+
+    });
   }
 
   @override

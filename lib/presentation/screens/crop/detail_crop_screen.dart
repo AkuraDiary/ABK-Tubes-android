@@ -1,4 +1,5 @@
 import 'package:asisten_buku_kebun/DI.dart';
+import 'package:asisten_buku_kebun/app.dart';
 import 'package:asisten_buku_kebun/data/request_state.dart';
 import 'package:asisten_buku_kebun/presentation/common/util/app_toast.dart';
 import 'package:asisten_buku_kebun/presentation/routing/app_routes.dart';
@@ -20,7 +21,7 @@ class DetailCropScreen extends StatefulWidget {
   State<DetailCropScreen> createState() => _DetailCropScreenState();
 }
 
-class _DetailCropScreenState extends State<DetailCropScreen> {
+class _DetailCropScreenState extends State<DetailCropScreen> with RouteAware {
   @override
   void initState() {
     super.initState();
@@ -28,12 +29,27 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     final crop = widget.cropPresenter.selectedCrop;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${crop?.cropName ?? "-"} Detail'),
-      ),
+      appBar: AppBar(title: Text('${crop?.cropName ?? "-"} Detail')),
       body: RefreshIndicator(
         onRefresh: _getCropLogs,
         child: ListView(
@@ -44,22 +60,16 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
             CropActionRow(
               onAddLogCropTap: () {
                 widget.cropPresenter.selectedCrop = crop;
-                AppRouting().navigateTo(
-                  AppRoutes.createLogScreen,
-                );
+                AppRouting().navigateTo(AppRoutes.createLogScreen);
               },
 
               onEditCropTap: () {
                 widget.cropPresenter.selectedCrop = crop;
-                AppRouting().navigateTo(
-                  AppRoutes.addEditCropScreen,
-                );
+                AppRouting().navigateTo(AppRoutes.addEditCropScreen);
               },
             ),
             const SizedBox(height: 24),
-            CropLogSection(
-              presenter: widget.cropLogPresenter,
-            ),
+            CropLogSection(presenter: widget.cropLogPresenter),
           ],
         ),
       ),

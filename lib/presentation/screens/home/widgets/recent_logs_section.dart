@@ -6,48 +6,10 @@ import 'package:asisten_buku_kebun/presenter/auth_presenter.dart';
 import 'package:asisten_buku_kebun/presenter/crop_log_presenter.dart';
 import 'package:flutter/material.dart';
 
-class RecentLogsSection extends StatefulWidget {
-  CropLogPresenter cropLogPresenter = DI.cropLogPresenter;
-  AuthPresenter authPresenter = DI.authPresenter;
+class RecentLogsSection extends StatelessWidget {
+  List<CropLogModel> latestLogs;
 
-  RecentLogsSection({super.key});
-
-  @override
-  State<RecentLogsSection> createState() => _RecentLogsSectionState();
-}
-
-class _RecentLogsSectionState extends State<RecentLogsSection> {
-
-  List<CropLogModel> _latestLogs = [];
-
-  Future<void> _fetchLatestLogs() async {
-    final userId = widget.authPresenter.loggedInUser?.id;
-    if (userId != null) {
-      try {
-        final logs = await widget.cropLogPresenter.fetchLatestCropLogs(userId);
-        // You can use the fetched logs as needed
-        if (mounted) {
-          setState(() {
-            _latestLogs = logs;
-          });
-        }
-      } catch (e) {
-        // Handle error
-        if (!mounted) return;
-        showAppToast(
-          context,
-          'Terjadi Kesalahan : ${widget.cropLogPresenter.message}',
-          title: 'Gagal ❌',
-        );
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchLatestLogs();
-  }
+  RecentLogsSection({super.key, required this.latestLogs});
 
   @override
   Widget build(BuildContext context) {
@@ -66,24 +28,24 @@ class _RecentLogsSectionState extends State<RecentLogsSection> {
             color: Colors.grey[100],
             borderRadius: BorderRadius.circular(12),
           ),
-          child: _latestLogs.isEmpty
+          child: latestLogs.isEmpty
               ? Text(
                   "Belum ada catatan terbaru",
                   style: TextStyle(color: Colors.grey),
                 )
               : ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: _latestLogs
-                    .map(
-                      (log) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(log.notes ?? ""),
-                        subtitle: Text(formatDisplayDate(log.createdAt)),
-                      ),
-                    )
-                    .toList(),
-              ),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: latestLogs
+                      .map(
+                        (log) => ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(log.notes ?? ""),
+                          subtitle: Text(formatDisplayDate(log.createdAt)),
+                        ),
+                      )
+                      .toList(),
+                ),
         ),
       ],
     );
