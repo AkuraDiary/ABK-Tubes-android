@@ -72,11 +72,11 @@ class _HomePageState extends State<HomeScreen> {
           children: [
             GreetingSection(name: name),
             const SizedBox(height: 20),
-            const CropSummarySection(),
+            CropSummarySection(),
             const SizedBox(height: 20),
             const PrimaryActionsSection(),
             const SizedBox(height: 24),
-            const RecentLogsSection(),
+             RecentLogsSection(),
           ],
         ),
       ),

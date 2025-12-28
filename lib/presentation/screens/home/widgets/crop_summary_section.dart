@@ -1,17 +1,39 @@
+import 'package:asisten_buku_kebun/DI.dart';
+import 'package:asisten_buku_kebun/presentation/common/util/app_toast.dart';
 import 'package:asisten_buku_kebun/presentation/resources/app_colors.dart';
+import 'package:asisten_buku_kebun/presentation/resources/app_constant.dart';
+import 'package:asisten_buku_kebun/presenter/auth_presenter.dart';
+import 'package:asisten_buku_kebun/presenter/crop_presenter.dart';
 import 'package:flutter/material.dart';
 
-class CropSummarySection extends StatelessWidget {
-  const CropSummarySection({super.key});
+class CropSummarySection extends StatefulWidget {
+  CropPresenter cropPresenter = DI.cropPresenter;
+  AuthPresenter authPresenter = DI.authPresenter;
+
+  CropSummarySection({super.key});
+
+  @override
+  State<CropSummarySection> createState() => _CropSummarySectionState();
+}
+
+class _CropSummarySectionState extends State<CropSummarySection> {
+
+  int totalCrops = 0;
+  int sickCrops = 0;
+  @override
+  void initState() {
+    super.initState();
+    _calculateCropSummary();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: const [
+      children:  [
         Expanded(
           child: SummaryCard(
             title: "Total Tanaman",
-            value: "12",
+            value: totalCrops.toString(),
             icon: Icons.eco,
             color: AppColors.success900,
           ),
@@ -19,14 +41,35 @@ class CropSummarySection extends StatelessWidget {
         SizedBox(width: 12),
         Expanded(
           child: SummaryCard(
-            title: "Perlu Perhatian",
-            value: "3",
+            title: "Tanaman Sakit",
+            value: sickCrops.toString(),
             icon: Icons.warning,
             color: AppColors.warning700,
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _calculateCropSummary()  async {
+    try{
+      final userId = widget.authPresenter.loggedInUser?.id;
+      if (userId != null) {
+        await widget.cropPresenter.fetchMyCrops(userId);
+        if(!mounted) return;
+        setState(() {
+          totalCrops = widget.cropPresenter.myCrops.length;
+          sickCrops = widget.cropPresenter.myCrops.where((crop) => crop.cropStatus == AppConstant.CROP_SAKIT).length;
+        });
+      }
+    }catch(e){
+      if(!mounted) return;
+      showAppToast(
+        context,
+        'Terjadi Kesalahan : ${widget.cropPresenter.message}',
+        title: 'Gagal ❌',
+      );
+    }
   }
 }
 

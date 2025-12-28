@@ -8,12 +8,48 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class CropLogPresenter {
   RequestState requestState = RequestState.initial;
   List<CropLogModel> cropLogs = [];
+
   String message = '';
 
   void reset() {
     requestState = RequestState.initial;
     cropLogs = [];
     message = '';
+  }
+
+  Future<List<CropLogModel>> fetchLatestCropLogs(
+    String userId, {
+    int limit = 5,
+  }) async {
+    requestState = RequestState.initial;
+    try {
+      requestState = RequestState.loading;
+      final result = await Supabase.instance.client
+          .from('crop_logs')
+          .select('''
+          crop_log_id,
+          created_at,
+          crop_id,
+          notes,
+          log_tag,
+          image_url,
+          crops!inner (
+            crop_id,
+            user_id
+          )
+        ''')
+          .eq('crops.user_id', userId)
+          .order('created_at', ascending: false)
+          .limit(limit);
+
+      final logsData = result as List<dynamic>;
+      requestState = RequestState.loaded;
+      return logsData.map((e) => CropLogModel.fromJson(e)).toList();
+    } catch (e) {
+      requestState = RequestState.error;
+      message = e.toString();
+      throw Exception('Failed to fetch latest crop logs: $e');
+    }
   }
 
   Future<void> fetchCropLogs(String cropId) async {
@@ -54,23 +90,21 @@ class CropLogPresenter {
       );
 
       if (response.status >= 200 && response.status < 300) {
-
         requestState = RequestState.success;
       } else if (response.status >= 400 && response.status < 500) {
-
         print('Client error: ${response.status}');
         throw Exception('Failed to load data due to a client error');
       } else {
-
         print('Other error: ${response.status}');
-        throw Exception('Failed to load data with status code: ${response.status}');
+        throw Exception(
+          'Failed to load data with status code: ${response.status}',
+        );
       }
     } catch (e) {
       message = e.toString();
       requestState = RequestState.error;
     }
   }
-
 
   Future<Uint8List> compressImageBytes(String filePath) async {
     final result = await FlutterImageCompress.compressWithFile(
