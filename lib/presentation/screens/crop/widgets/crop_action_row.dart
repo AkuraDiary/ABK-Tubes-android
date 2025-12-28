@@ -7,7 +7,10 @@ import 'package:flutter/material.dart';
 import '../../../resources/text_styles_resources.dart';
 
 class CropActionRow extends StatelessWidget {
-  const CropActionRow({super.key});
+  final Function() onEditCropTap;
+  final Function() onAddLogCropTap;
+
+  const CropActionRow({super.key, required this.onEditCropTap, required this.onAddLogCropTap});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +21,7 @@ class CropActionRow extends StatelessWidget {
             icon: Icons.add,
             label: "Tambah Log",
 
-            onTap: () {
-              AppRouting().navigateTo(AppRoutes.createLogScreen);
-            },
+            onTap:onEditCropTap,
           ),
         ),
         const SizedBox(width: 12),
@@ -28,9 +29,7 @@ class CropActionRow extends StatelessWidget {
           child: _ActionButton(
             icon: Icons.edit,
             label: "Edit Data",
-            onTap: () {
-              AppRouting().navigateTo(AppRoutes.addEditCropScreen);
-            },
+            onTap: onEditCropTap,
           ),
         ),
       ],

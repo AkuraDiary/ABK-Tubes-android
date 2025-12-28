@@ -24,6 +24,14 @@ class CropModel {
   });
 
   CropModel.fromJson(Map<String, dynamic> json) {
+    // crop_id,
+    // user_id,
+    // crop_name,
+    // type,
+    // crop_status,
+    // location_lat,
+    // location_lon,
+    // created_at,
     cropId = json['crop_id'];
     userId = json['user_id'];
     cropName = json['crop_name'];

@@ -42,8 +42,17 @@ class _CropMapScreenState extends State<CropMapScreen> {
 
     LatLng location = LatLng(lat, long);
 
+    if(!mounted) return;
     setState(() {
       _currentPosition = location;
+      _mapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: _currentPosition!,
+            zoom: 15,
+          ),
+        ),
+      );
       _markers.add(
         Marker(
           markerId: const MarkerId('You'),
@@ -53,12 +62,17 @@ class _CropMapScreenState extends State<CropMapScreen> {
       );
     });
   }
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
 
   @override
   initState() {
     super.initState();
     _getLocation();
-    // _getCrops();
+    _getCrops();
   }
 
   Future<void> _getCrops() async {

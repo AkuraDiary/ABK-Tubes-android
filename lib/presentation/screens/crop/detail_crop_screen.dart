@@ -41,7 +41,21 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
           children: [
             CropHeaderCard(crop: crop),
             const SizedBox(height: 16),
-            CropActionRow(),
+            CropActionRow(
+              onAddLogCropTap: () {
+                widget.cropPresenter.selectedCrop = crop;
+                AppRouting().navigateTo(
+                  AppRoutes.createLogScreen,
+                );
+              },
+
+              onEditCropTap: () {
+                widget.cropPresenter.selectedCrop = crop;
+                AppRouting().navigateTo(
+                  AppRoutes.addEditCropScreen,
+                );
+              },
+            ),
             const SizedBox(height: 24),
             CropLogSection(
               presenter: widget.cropLogPresenter,

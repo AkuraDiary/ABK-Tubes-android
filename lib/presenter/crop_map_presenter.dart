@@ -25,6 +25,7 @@ class CropMapPresenter {
       crop_status,
       location_lat,
       location_lon,
+      created_at,
       users (
         name
       )
